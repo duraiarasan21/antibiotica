@@ -1,12 +1,15 @@
 package com.antibiotica.data
 
 import android.os.Parcelable
+import com.antibiotica.R
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class PathogenData(
     val id: String,
     val name: String,
+    val imageResId: Int,
+    val referenceImageResId: Int,
     val similarityScore: Int,
     val confidence: String,
     val recommendedAntibiotic: String,
@@ -33,6 +36,8 @@ object PathogenSamples {
         PathogenData(
             id = "#8842",
             name = "Staphylococcus aureus",
+            imageResId = R.drawable.s_aureus,
+            referenceImageResId = R.drawable.ref_s_aureus,
             similarityScore = 98,
             confidence = "High Confidence",
             recommendedAntibiotic = "Vancomycin",
@@ -54,6 +59,8 @@ object PathogenSamples {
         PathogenData(
             id = "#8843",
             name = "Pseudomonas aeruginosa",
+            imageResId = R.drawable.p_aeruginosa,
+            referenceImageResId = R.drawable.ref_p_aeruginosa,
             similarityScore = 94,
             confidence = "High Confidence",
             recommendedAntibiotic = "Ciprofloxacin",
@@ -75,6 +82,8 @@ object PathogenSamples {
         PathogenData(
             id = "#8844",
             name = "Escherichia coli",
+            imageResId = R.drawable.e_coli,
+            referenceImageResId = R.drawable.ref_e_coli,
             similarityScore = 99,
             confidence = "Very High Confidence",
             recommendedAntibiotic = "Gentamicin",

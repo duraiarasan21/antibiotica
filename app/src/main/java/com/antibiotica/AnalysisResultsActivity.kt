@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -146,7 +149,16 @@ fun AnalysisResultsScreen(
                             .background(Color.Gray.copy(alpha = 0.1f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Biotech, contentDescription = null, modifier = Modifier.size(100.dp), tint = Primary.copy(alpha = 0.1f))
+                        if (pathogenData != null) {
+                            Image(
+                                painter = painterResource(id = pathogenData.imageResId),
+                                contentDescription = "Identified Pathogen",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(Icons.Default.Biotech, contentDescription = null, modifier = Modifier.size(100.dp), tint = Primary.copy(alpha = 0.1f))
+                        }
 
                         Box(
                             modifier = Modifier
@@ -293,8 +305,8 @@ fun AnalysisResultsScreen(
                 Text(text = "Visual Evidence", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    EvidenceItem("Your Sample", "UPLOADED", modifier = Modifier.weight(1f))
-                    EvidenceItem("Database Ref", "MATCH ${pathogenData?.matchId}", isMatch = true, modifier = Modifier.weight(1f))
+                    EvidenceItem("Your Sample", "UPLOADED", imageResId = pathogenData?.imageResId, modifier = Modifier.weight(1f))
+                    EvidenceItem("Database Ref", "MATCH ${pathogenData?.matchId}", imageResId = pathogenData?.referenceImageResId, isMatch = true, modifier = Modifier.weight(1f))
                 }
             }
 
@@ -351,7 +363,7 @@ fun ProbabilityBar(label: String, probability: Float, color: Color) {
 }
 
 @Composable
-fun EvidenceItem(label: String, badge: String, isMatch: Boolean = false, modifier: Modifier = Modifier) {
+fun EvidenceItem(label: String, badge: String, imageResId: Int? = null, isMatch: Boolean = false, modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
@@ -362,7 +374,17 @@ fun EvidenceItem(label: String, badge: String, isMatch: Boolean = false, modifie
                 .border(if (isMatch) androidx.compose.foundation.BorderStroke(2.dp, Primary.copy(alpha = 0.3f)) else androidx.compose.foundation.BorderStroke(0.dp, Color.Transparent), RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Science, contentDescription = null, tint = Color.Gray.copy(alpha = 0.5f), modifier = Modifier.size(48.dp))
+            if (imageResId != null) {
+                Image(
+                    painter = painterResource(id = imageResId),
+                    contentDescription = label,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(Icons.Default.Science, contentDescription = null, tint = Color.Gray.copy(alpha = 0.5f), modifier = Modifier.size(48.dp))
+            }
+
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
