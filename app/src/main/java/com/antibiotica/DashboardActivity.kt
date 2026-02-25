@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.antibiotica.data.PathogenData
+import com.antibiotica.data.PathogenSamples
 import com.antibiotica.ui.components.PrimaryButton
 import com.antibiotica.ui.theme.AntibioticaTheme
 import com.antibiotica.ui.theme.Primary
@@ -38,6 +40,11 @@ class DashboardActivity : ComponentActivity() {
                 DashboardScreen(
                     onStartAnalysisClick = {
                         startActivity(Intent(this, UploadSampleActivity::class.java))
+                    },
+                    onReportClick = { pathogenData ->
+                        val intent = Intent(this, AnalysisResultsActivity::class.java)
+                        intent.putExtra("pathogen_data", pathogenData)
+                        startActivity(intent)
                     }
                 )
             }
@@ -47,7 +54,7 @@ class DashboardActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(onStartAnalysisClick: () -> Unit) {
+fun DashboardScreen(onStartAnalysisClick: () -> Unit, onReportClick: (PathogenData) -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -249,9 +256,9 @@ fun DashboardScreen(onStartAnalysisClick: () -> Unit) {
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        ReportItem("Patient #4829", "E. coli • Ward 3B", "Analysis Ready", "2 min ago", Color(0xFFE8F5E9), Color(0xFF2E7D32))
-                        ReportItem("Patient #4830", "Unknown Specimen", "Processing...", "15 min ago", Color(0xFFF5F5F5), Color(0xFF757575), isProcessing = true)
-                        ReportItem("Patient #4792", "S. aureus • ICU", "High Resistance", "2h ago", Color(0xFFFFEBEE), Color(0xFFC62828))
+                        ReportItem("Patient #4829", "E. coli • Ward 3B", "Analysis Ready", "2 min ago", Color(0xFFE8F5E9), Color(0xFF2E7D32), onClick = { onReportClick(PathogenSamples.samples[2]) })
+                        ReportItem("Patient #4830", "Unknown Specimen", "Processing...", "15 min ago", Color(0xFFF5F5F5), Color(0xFF757575), isProcessing = true, onClick = {})
+                        ReportItem("Patient #4792", "S. aureus • ICU", "High Resistance", "2h ago", Color(0xFFFFEBEE), Color(0xFFC62828), onClick = { onReportClick(PathogenSamples.samples[0]) })
                     }
                 }
             }
@@ -299,9 +306,9 @@ fun StatCard(value: String, label: String, icon: ImageVector, bgColor: Color, ic
 }
 
 @Composable
-fun ReportItem(patient: String, detail: String, status: String, time: String, statusBg: Color, statusText: Color, isProcessing: Boolean = false) {
+fun ReportItem(patient: String, detail: String, status: String, time: String, statusBg: Color, statusText: Color, isProcessing: Boolean = false, onClick: () -> Unit) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
@@ -393,6 +400,6 @@ fun BottomNavItem(label: String, icon: ImageVector, selected: Boolean) {
 @Composable
 fun DashboardScreenPreview() {
     AntibioticaTheme {
-        DashboardScreen({})
+        DashboardScreen({}, {})
     }
 }

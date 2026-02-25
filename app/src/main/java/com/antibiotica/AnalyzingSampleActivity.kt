@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -118,8 +121,18 @@ fun AnalyzingSampleScreen(pathogenData: PathogenData?, onBackClick: () -> Unit, 
                     .background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
-                // Background image placeholder
-                Icon(Icons.Default.Biotech, contentDescription = null, modifier = Modifier.size(120.dp), tint = Primary.copy(alpha = 0.1f))
+                // Background image
+                if (pathogenData != null) {
+                    Image(
+                        painter = painterResource(id = pathogenData.imageResId),
+                        contentDescription = "Sample being analyzed",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        alpha = 0.7f
+                    )
+                } else {
+                    Icon(Icons.Default.Biotech, contentDescription = null, modifier = Modifier.size(120.dp), tint = Primary.copy(alpha = 0.1f))
+                }
 
                 // Scanning Line Animation
                 val infiniteTransition = rememberInfiniteTransition(label = "scan")

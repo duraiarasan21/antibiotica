@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -156,7 +159,7 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                     .clip(RoundedCornerShape(24.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     .clickable {
-                        // Simulate selecting a random one if none selected
+                        // Toggle selection
                         if (selectedPathogen == null) selectedPathogen = PathogenSamples.samples.random()
                         else selectedPathogen = null
                     }
@@ -168,18 +171,24 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                 contentAlignment = Alignment.Center
             ) {
                 if (selectedPathogen != null) {
+                    Image(
+                        painter = painterResource(id = selectedPathogen!!.imageResId),
+                        contentDescription = "Selected Sample",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Primary.copy(alpha = 0.05f)),
+                            .background(Color.Black.copy(alpha = 0.3f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
                             Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Primary, modifier = Modifier.size(64.dp))
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = "Sample Selected", color = Primary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                            Text(text = selectedPathogen?.name ?: "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-                            Text(text = "Tap to change", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                            Text(text = "Sample Selected", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                            Text(text = selectedPathogen?.name ?: "", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                            Text(text = "Tap to change", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
                         }
                     }
                 } else {
@@ -274,15 +283,14 @@ fun RecentSampleCard(pathogen: PathogenData, isSelected: Boolean, onClick: () ->
         border = androidx.compose.foundation.BorderStroke(2.dp, if (isSelected) Primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
+            Image(
+                painter = painterResource(id = pathogen.imageResId),
+                contentDescription = pathogen.name,
                 modifier = Modifier
                     .size(64.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.Gray.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Biotech, contentDescription = null, tint = if (isSelected) Primary else Color.Gray, modifier = Modifier.size(32.dp))
-            }
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = pathogen.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
