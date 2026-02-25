@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.antibiotica.ui.components.PrimaryButton
 import com.antibiotica.ui.components.RoundedTextField
+import com.antibiotica.ui.components.SocialButton
 import com.antibiotica.ui.theme.AntibioticaTheme
 import com.antibiotica.ui.theme.Primary
 
@@ -195,7 +197,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onSignUpClick: () -> Unit) {
                 )
                 SocialButton(
                     text = "Apple",
-                    icon = Icons.Default.Apple,
+                    icon = Icons.Default.Settings,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -236,21 +238,6 @@ fun LoginScreen(onLoginClick: () -> Unit, onSignUpClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(24.dp))
         }
-    }
-}
-
-@Composable
-fun SocialButton(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
-    OutlinedButton(
-        onClick = { /* Handle social login */ },
-        modifier = modifier.height(52.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onBackground)
-    ) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium))
     }
 }
 

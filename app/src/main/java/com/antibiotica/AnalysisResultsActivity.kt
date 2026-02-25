@@ -342,7 +342,7 @@ fun ProbabilityBar(label: String, probability: Float, color: Color) {
             modifier = Modifier
                 .width(40.dp)
                 .fillMaxHeight(probability)
-                .clip(RoundedCornerShape(t = 4.dp))
+                .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
                 .background(color)
         )
         Spacer(modifier = Modifier.height(8.dp))

@@ -319,7 +319,7 @@ fun ReportItem(patient: String, detail: String, status: String, time: String, st
                     if (isProcessing) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Primary, strokeWidth = 2.dp)
                     } else {
-                        Icon(Icons.Default.LabProfile, contentDescription = null, tint = Color.Gray)
+                        Icon(Icons.Default.Description, contentDescription = null, tint = Color.Gray)
                     }
                 }
             }
