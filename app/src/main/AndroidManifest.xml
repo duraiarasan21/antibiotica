@@ -20,7 +20,12 @@
         </activity>
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".RegistrationActivity"></activity>
+        <activity android:name=".RegistrationSuccessActivity"></activity>
         <activity android:name=".DashboardActivity"></activity>
+        <activity android:name=".UploadSampleActivity"></activity>
+        <activity android:name=".AnalyzingSampleActivity"></activity>
+        <activity android:name=".AnalysisResultsActivity"></activity>
+        <activity android:name=".FinalReportActivity"></activity>
     </application>
 
 </manifest>
