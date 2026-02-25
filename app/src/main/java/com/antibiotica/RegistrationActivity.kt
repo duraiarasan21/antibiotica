@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.antibiotica.ui.components.PrimaryButton
 import com.antibiotica.ui.components.RoundedTextField
+import com.antibiotica.ui.components.SocialButton
 import com.antibiotica.ui.theme.AntibioticaTheme
 import com.antibiotica.ui.theme.Primary
 
@@ -216,7 +217,7 @@ fun RegistrationScreen(
                 )
                 SocialButton(
                     text = "Apple",
-                    icon = Icons.Default.Apple,
+                    icon = Icons.Default.Settings,
                     modifier = Modifier.weight(1f)
                 )
             }
