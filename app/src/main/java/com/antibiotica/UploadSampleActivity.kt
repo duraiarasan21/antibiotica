@@ -3,7 +3,9 @@ package com.antibiotica
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +61,31 @@ class UploadSampleActivity : ComponentActivity() {
 fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -> Unit) {
     var selectedPathogen by remember { mutableStateOf<PathogenData?>(null) }
     val scrollState = rememberScrollState()
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val pathogen = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                result.data?.getParcelableExtra("selected_sample", PathogenData::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                result.data?.getParcelableExtra("selected_sample")
+            }
+            selectedPathogen = pathogen
+        }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            // Mocking camera capture by selecting a random prebuilt image
+            selectedPathogen = PathogenSamples.samples.random()
+        }
+    }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold(
         topBar = {
@@ -151,6 +178,38 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Button(
+                    onClick = { cameraLauncher.launch(null) },
+                    modifier = Modifier.weight(1f).height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                ) {
+                    Icon(Icons.Default.PhotoCamera, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Capture", fontWeight = FontWeight.Bold)
+                }
+                Button(
+                    onClick = {
+                        val intent = Intent(context, GalleryActivity::class.java)
+                        galleryLauncher.launch(intent)
+                    },
+                    modifier = Modifier.weight(1f).height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                ) {
+                    Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Gallery", fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // Upload Area
             Box(
                 modifier = Modifier
@@ -204,46 +263,6 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Sample Gallery Grid
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "Select from Gallery",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 2-column grid using Column and Row
-                val samples = PathogenSamples.samples
-                for (i in samples.indices step 2) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        GallerySampleCard(
-                            pathogen = samples[i],
-                            isSelected = selectedPathogen?.id == samples[i].id,
-                            onClick = { selectedPathogen = samples[i] },
-                            modifier = Modifier.weight(1f)
-                        )
-                        if (i + 1 < samples.size) {
-                            GallerySampleCard(
-                                pathogen = samples[i + 1],
-                                isSelected = selectedPathogen?.id == samples[i + 1].id,
-                                onClick = { selectedPathogen = samples[i + 1] },
-                                modifier = Modifier.weight(1f)
-                            )
-                        } else {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
 
             // Tips Card
             Surface(
@@ -271,7 +290,13 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
 }
 
 @Composable
-fun GallerySampleCard(pathogen: PathogenData, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun GallerySampleCard(
+    pathogen: PathogenData,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    showName: Boolean = false,
+    onClick: () -> Unit
+) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -316,14 +341,16 @@ fun GallerySampleCard(pathogen: PathogenData, isSelected: Boolean, modifier: Mod
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = pathogen.name,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
+            if (showName) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = pathogen.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
+            }
             Text(
                 text = "ID: ${pathogen.id}",
                 style = MaterialTheme.typography.labelSmall,

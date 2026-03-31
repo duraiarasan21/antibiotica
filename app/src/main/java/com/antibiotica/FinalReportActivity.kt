@@ -35,6 +35,9 @@ import com.antibiotica.ui.components.PrimaryButton
 import com.antibiotica.ui.theme.AntibioticaTheme
 import com.antibiotica.ui.theme.Primary
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import android.os.Environment
 
 class FinalReportActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,12 +108,31 @@ fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
                     PrimaryButton(
                         text = "Generate & Download Report",
                         onClick = {
-                            val fileName = "Analysis_Report_${pathogenData?.id ?: "unknown"}.${selectedFormat.lowercase()}"
+                            val fileName = "Analysis_Report_${pathogenData?.id?.replace("#", "") ?: "unknown"}.${selectedFormat.lowercase()}"
+
                             scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "Generating report... $fileName downloaded successfully.",
-                                    duration = SnackbarDuration.Short
-                                )
+                                try {
+                                    // Mocking PDF/CSV generation and saving to device
+                                    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                                    val file = File(downloadsDir, fileName)
+                                    FileOutputStream(file).use { out ->
+                                        out.write("Antibiotica Analysis Report\n".toByteArray())
+                                        out.write("Pathogen: ${pathogenData?.name}\n".toByteArray())
+                                        out.write("ID: ${pathogenData?.id}\n".toByteArray())
+                                        out.write("Confidence: ${pathogenData?.similarityScore}%\n".toByteArray())
+                                        out.write("Recommended: ${pathogenData?.recommendedAntibiotic}\n".toByteArray())
+                                    }
+
+                                    snackbarHostState.showSnackbar(
+                                        message = "Report saved to Downloads: $fileName",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                } catch (e: Exception) {
+                                    snackbarHostState.showSnackbar(
+                                        message = "Failed to save report: ${e.message}",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
                             }
                         },
                         icon = Icons.Default.Download
