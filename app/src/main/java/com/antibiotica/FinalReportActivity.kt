@@ -33,11 +33,15 @@ import com.antibiotica.data.PathogenData
 import com.antibiotica.ui.components.InfoCard
 import com.antibiotica.ui.components.PrimaryButton
 import com.antibiotica.ui.theme.AntibioticaTheme
+import androidx.compose.ui.graphics.toArgb
 import com.antibiotica.ui.theme.Primary
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import android.os.Environment
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
 
 class FinalReportActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,36 +116,81 @@ fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
 
                             scope.launch {
                                 try {
-                                    // Mocking PDF/CSV generation and saving to device
                                     val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                                     val file = File(downloadsDir, fileName)
-                                    FileOutputStream(file).use { out ->
-                                        out.write("========================================\n".toByteArray())
-                                        out.write("       ANTIBIOTICA ANALYSIS REPORT      \n".toByteArray())
-                                        out.write("========================================\n\n".toByteArray())
-                                        out.write("SAMPLE INFORMATION\n".toByteArray())
-                                        out.write("------------------\n".toByteArray())
-                                        out.write("Sample ID:     ${pathogenData?.id}\n".toByteArray())
-                                        out.write("Detected:      ${pathogenData?.name}\n".toByteArray())
-                                        out.write("Confidence:    ${pathogenData?.similarityScore}%\n".toByteArray())
-                                        out.write("Method:        ${pathogenData?.method ?: "Digital Image Analysis"}\n".toByteArray())
-                                        out.write("Time:          ${pathogenData?.processingTime ?: "1.2s"}\n\n".toByteArray())
 
-                                        out.write("ANALYSIS RESULTS\n".toByteArray())
-                                        out.write("----------------\n".toByteArray())
-                                        out.write("Recommended:   ${pathogenData?.recommendedAntibiotic}\n".toByteArray())
-                                        out.write("Therapy:       ${pathogenData?.recommendationType}\n".toByteArray())
-                                        out.write("Details:       ${pathogenData?.recommendationDetails}\n\n".toByteArray())
+                                    if (selectedFormat == "PDF") {
+                                        val pdfDocument = PdfDocument()
+                                        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 Size
+                                        val page = pdfDocument.startPage(pageInfo)
+                                        val canvas = page.canvas
+                                        val paint = Paint()
 
-                                        out.write("ZONE MEASUREMENTS\n".toByteArray())
-                                        out.write("-----------------\n".toByteArray())
-                                        out.write("Inhibition:    ${pathogenData?.inhibitionZone}mm\n".toByteArray())
-                                        out.write("Resistance:    ${pathogenData?.resistanceBreakpoint}mm\n\n".toByteArray())
+                                        var y = 50f
+                                        paint.textSize = 24f
+                                        paint.isFakeBoldText = true
+                                        canvas.drawText("ANTIBIOTICA ANALYSIS REPORT", 150f, y, paint)
 
-                                        out.write("----------------------------------------\n".toByteArray())
-                                        out.write("[Screenshot of Results Included in PDF]\n".toByteArray())
-                                        out.write("----------------------------------------\n\n".toByteArray())
-                                        out.write("Disclaimer: This AI-generated report is for informational purposes and should be verified by a medical professional.\n".toByteArray())
+                                        y += 40f
+                                        paint.textSize = 16f
+                                        paint.isFakeBoldText = true
+                                        canvas.drawText("SAMPLE INFORMATION", 50f, y, paint)
+
+                                        y += 25f
+                                        paint.isFakeBoldText = false
+                                        paint.textSize = 14f
+                                        canvas.drawText("Sample ID: ${pathogenData?.id}", 50f, y, paint)
+                                        y += 20f
+                                        canvas.drawText("Detected: ${pathogenData?.name}", 50f, y, paint)
+                                        y += 20f
+                                        canvas.drawText("Confidence: ${pathogenData?.similarityScore}%", 50f, y, paint)
+                                        y += 20f
+                                        canvas.drawText("Method: ${pathogenData?.method ?: "Digital Image Analysis"}", 50f, y, paint)
+
+                                        y += 40f
+                                        paint.isFakeBoldText = true
+                                        canvas.drawText("ANALYSIS RESULTS", 50f, y, paint)
+                                        y += 25f
+                                        paint.isFakeBoldText = false
+                                        canvas.drawText("Recommended Antibiotic: ${pathogenData?.recommendedAntibiotic}", 50f, y, paint)
+                                        y += 20f
+                                        canvas.drawText("Therapy: ${pathogenData?.recommendationType}", 50f, y, paint)
+
+                                        y += 40f
+                                        paint.isFakeBoldText = true
+                                        canvas.drawText("ZONE MEASUREMENTS", 50f, y, paint)
+                                        y += 25f
+                                        paint.isFakeBoldText = false
+                                        canvas.drawText("Inhibition Zone: ${pathogenData?.inhibitionZone}mm", 50f, y, paint)
+                                        y += 20f
+                                        canvas.drawText("Resistance Breakpoint: ${pathogenData?.resistanceBreakpoint}mm", 50f, y, paint)
+
+                                        y += 60f
+                                        paint.color = Color.Gray.toArgb()
+                                        canvas.drawText("[Logo Placeholder]", 240f, y, paint)
+
+                                        y += 100f
+                                        canvas.drawRect(50f, y, 545f, y + 200f, Paint().apply { color = Color.LightGray.toArgb(); style = Paint.Style.STROKE })
+                                        canvas.drawText("Screenshot of Results Placeholder", 180f, y + 110f, paint)
+
+                                        y += 250f
+                                        paint.textSize = 10f
+                                        canvas.drawText("Disclaimer: This AI-generated report is for informational purposes.", 50f, y, paint)
+
+                                        pdfDocument.finishPage(page)
+                                        FileOutputStream(file).use { out ->
+                                            pdfDocument.writeTo(out)
+                                        }
+                                        pdfDocument.close()
+                                    } else {
+                                        // Simple CSV implementation
+                                        FileOutputStream(file).use { out ->
+                                            out.write("Attribute,Value\n".toByteArray())
+                                            out.write("Sample ID,${pathogenData?.id}\n".toByteArray())
+                                            out.write("Detected,${pathogenData?.name}\n".toByteArray())
+                                            out.write("Confidence,${pathogenData?.similarityScore}%\n".toByteArray())
+                                            out.write("Recommended,${pathogenData?.recommendedAntibiotic}\n".toByteArray())
+                                        }
                                     }
 
                                     snackbarHostState.showSnackbar(

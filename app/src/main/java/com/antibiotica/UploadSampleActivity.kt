@@ -183,13 +183,13 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                PrimaryButton(
+                SecondaryButton(
                     text = "Capture",
                     onClick = { cameraLauncher.launch(null) },
                     icon = Icons.Default.PhotoCamera,
                     modifier = Modifier.weight(1f)
                 )
-                PrimaryButton(
+                SecondaryButton(
                     text = "Gallery",
                     onClick = {
                         val intent = Intent(context, GalleryActivity::class.java)
@@ -341,12 +341,12 @@ fun GallerySampleCard(
                     textAlign = TextAlign.Center,
                     maxLines = 1
                 )
+                Text(
+                    text = "ID: ${pathogen.id}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
             }
-            Text(
-                text = "ID: ${pathogen.id}",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray
-            )
         }
     }
 }
