@@ -135,14 +135,14 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Upload Sample Image",
+                text = "Select Pathogen Sample",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Please provide a clear photo of the biological sample or select a recent one for AI analysis.",
+                text = "Choose a preloaded sample from the gallery below to analyze its antibiotic susceptibility.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center,
@@ -158,11 +158,6 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                     .aspectRatio(4f / 3f)
                     .clip(RoundedCornerShape(24.dp))
                     .background(MaterialTheme.colorScheme.surface)
-                    .clickable {
-                        // Toggle selection
-                        if (selectedPathogen == null) selectedPathogen = PathogenSamples.samples.random()
-                        else selectedPathogen = null
-                    }
                     .border(
                         width = 2.dp,
                         color = if (selectedPathogen != null) Primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
@@ -209,19 +204,46 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Action Buttons
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ActionCard("Take Photo", Icons.Default.PhotoCamera, modifier = Modifier.weight(1f)) {
-                    selectedPathogen = PathogenSamples.samples[0] // Select S. aureus
-                }
-                ActionCard("From Gallery", Icons.Default.PhotoLibrary, modifier = Modifier.weight(1f)) {
-                    selectedPathogen = PathogenSamples.samples[2] // Select E. coli
+            // Sample Gallery Grid
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Select from Gallery",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 2-column grid using Column and Row
+                val samples = PathogenSamples.samples
+                for (i in samples.indices step 2) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        GallerySampleCard(
+                            pathogen = samples[i],
+                            isSelected = selectedPathogen?.id == samples[i].id,
+                            onClick = { selectedPathogen = samples[i] },
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (i + 1 < samples.size) {
+                            GallerySampleCard(
+                                pathogen = samples[i + 1],
+                                isSelected = selectedPathogen?.id == samples[i + 1].id,
+                                onClick = { selectedPathogen = samples[i + 1] },
+                                modifier = Modifier.weight(1f)
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Tips Card
             Surface(
@@ -244,61 +266,69 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Recent Uploads - Now using the actual three pathogens for selection
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Available Samples", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text(text = "View All", color = Primary, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    PathogenSamples.samples.forEach { pathogen ->
-                        RecentSampleCard(
-                            pathogen = pathogen,
-                            isSelected = selectedPathogen?.id == pathogen.id,
-                            onClick = { selectedPathogen = pathogen }
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
 @Composable
-fun RecentSampleCard(pathogen: PathogenData, isSelected: Boolean, onClick: () -> Unit) {
+fun GallerySampleCard(pathogen: PathogenData, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        color = if (isSelected) Primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(2.dp, if (isSelected) Primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+        shape = RoundedCornerShape(16.dp),
+        color = if (isSelected) Primary.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) Primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+        ),
+        shadowElevation = if (isSelected) 4.dp else 0.dp
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = pathogen.imageResId),
-                contentDescription = pathogen.name,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box {
+                Image(
+                    painter = painterResource(id = pathogen.imageResId),
+                    contentDescription = pathogen.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                if (isSelected) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .size(24.dp)
+                            .background(Primary, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = "Selected",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = pathogen.name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 1
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = pathogen.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Text(text = "Sample ID: ${pathogen.id}", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-            }
-            if (isSelected) {
-                Icon(Icons.Default.CheckCircle, contentDescription = "Selected", tint = Primary)
-            }
+            Text(
+                text = "ID: ${pathogen.id}",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray
+            )
         }
     }
 }
@@ -323,27 +353,6 @@ fun StepIndicator(label: String, active: Boolean, modifier: Modifier = Modifier)
     }
 }
 
-@Composable
-fun ActionCard(text: String, icon: ImageVector, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Surface(
-        modifier = modifier
-            .height(100.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(icon, contentDescription = null, tint = Primary, modifier = Modifier.size(28.dp))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = text, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
