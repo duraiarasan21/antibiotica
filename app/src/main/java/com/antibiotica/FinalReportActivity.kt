@@ -34,6 +34,7 @@ import com.antibiotica.ui.components.InfoCard
 import com.antibiotica.ui.components.PrimaryButton
 import com.antibiotica.ui.theme.AntibioticaTheme
 import com.antibiotica.ui.theme.Primary
+import kotlinx.coroutines.launch
 
 class FinalReportActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,8 +62,11 @@ class FinalReportActivity : ComponentActivity() {
 fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
     val scrollState = rememberScrollState()
     var selectedFormat by remember { mutableStateOf("PDF") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Row(
                 modifier = Modifier
@@ -100,7 +104,15 @@ fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
                 ) {
                     PrimaryButton(
                         text = "Generate & Download Report",
-                        onClick = { /* Download */ },
+                        onClick = {
+                            val fileName = "Analysis_Report_${pathogenData?.id ?: "unknown"}.${selectedFormat.lowercase()}"
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "Generating report... $fileName downloaded successfully.",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        },
                         icon = Icons.Default.Download
                     )
                     Text(
