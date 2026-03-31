@@ -101,6 +101,119 @@ object PathogenSamples {
                 ProbabilityItem("Klebsiella", 0.10f),
                 ProbabilityItem("Enterobacter", 0.04f)
             )
+        ),
+        PathogenData(
+            id = "#8845",
+            name = "Pseudomonas aeruginosa",
+            imageResId = R.drawable.pseudomonas_sample_1,
+            referenceImageResId = R.drawable.ref_p_aeruginosa,
+            similarityScore = 95,
+            confidence = "High Confidence",
+            recommendedAntibiotic = "Ciprofloxacin",
+            recommendationType = "Recommended therapy",
+            recommendationDetails = "Sensitive to Ciprofloxacin, Gentamicin, Ceftazidime, and Imipenem. Resistant to Ampicillin.",
+            inhibitionZone = 22,
+            totalZone = 30,
+            resistanceBreakpoint = 18,
+            processingTime = "1.4s",
+            resistanceMarkers = "Ampicillin Resistance",
+            method = "Disk Diffusion",
+            matchId = "#423",
+            probabilityList = listOf(
+                ProbabilityItem("P. aeruginosa", 0.95f),
+                ProbabilityItem("P. putida", 0.10f),
+                ProbabilityItem("Stenotrophomonas", 0.05f)
+            )
+        ),
+        PathogenData(
+            id = "#8846",
+            name = "Bacillus species",
+            imageResId = R.drawable.bacillus_sample_1,
+            referenceImageResId = R.drawable.ref_s_aureus, // Placeholder for Bacillus ref
+            similarityScore = 92,
+            confidence = "High Confidence",
+            recommendedAntibiotic = "Vancomycin",
+            recommendationType = "Standard therapy",
+            recommendationDetails = "Gram-positive bacilli, spore-forming. Sensitive to Vancomycin, Tetracycline, and Ciprofloxacin.",
+            inhibitionZone = 26,
+            totalZone = 30,
+            resistanceBreakpoint = 17,
+            processingTime = "1.6s",
+            resistanceMarkers = "Spore-forming",
+            method = "Disk Diffusion",
+            matchId = "#424",
+            probabilityList = listOf(
+                ProbabilityItem("Bacillus subtilis", 0.92f),
+                ProbabilityItem("Bacillus cereus", 0.18f),
+                ProbabilityItem("Listeria", 0.05f)
+            )
+        ),
+        PathogenData(
+            id = "#8847",
+            name = "Pseudomonas aeruginosa (Sample 2)",
+            imageResId = R.drawable.pseudomonas_sample_2,
+            referenceImageResId = R.drawable.ref_p_aeruginosa,
+            similarityScore = 93,
+            confidence = "High Confidence",
+            recommendedAntibiotic = "Ciprofloxacin",
+            recommendationType = "Recommended therapy",
+            recommendationDetails = "Sensitive to Ciprofloxacin and Gentamicin. Showing typical P. aeruginosa characteristics.",
+            inhibitionZone = 20,
+            totalZone = 30,
+            resistanceBreakpoint = 18,
+            processingTime = "1.3s",
+            resistanceMarkers = "None detected",
+            method = "Disk Diffusion",
+            matchId = "#425",
+            probabilityList = listOf(
+                ProbabilityItem("P. aeruginosa", 0.93f),
+                ProbabilityItem("P. putida", 0.12f)
+            )
+        ),
+        PathogenData(
+            id = "#8848",
+            name = "Bacillus species (Sample 2)",
+            imageResId = R.drawable.bacillus_sample_2,
+            referenceImageResId = R.drawable.ref_s_aureus,
+            similarityScore = 90,
+            confidence = "High Confidence",
+            recommendedAntibiotic = "Vancomycin",
+            recommendationType = "Standard therapy",
+            recommendationDetails = "Gram-positive bacilli. Spore-forming noted. Sensitive to Vancomycin.",
+            inhibitionZone = 24,
+            totalZone = 30,
+            resistanceBreakpoint = 17,
+            processingTime = "1.5s",
+            resistanceMarkers = "Spore-forming",
+            method = "Disk Diffusion",
+            matchId = "#426",
+            probabilityList = listOf(
+                ProbabilityItem("Bacillus subtilis", 0.90f),
+                ProbabilityItem("Bacillus cereus", 0.20f)
+            )
+        ),
+        PathogenData(
+            id = "#8849",
+            name = "Klebsiella pneumoniae",
+            imageResId = R.drawable.klebsiella_sample,
+            referenceImageResId = R.drawable.ref_e_coli, // Placeholder for Klebsiella ref
+            similarityScore = 96,
+            confidence = "High Confidence",
+            recommendedAntibiotic = "Carbapenems",
+            recommendationType = "Standard therapy",
+            recommendationDetails = "Gram-negative, non-motile, lactose-fermenting bacilli. Resistant to Ampicillin. Sensitive to Carbapenems and Gentamicin.",
+            inhibitionZone = 25,
+            totalZone = 30,
+            resistanceBreakpoint = 16,
+            processingTime = "1.7s",
+            resistanceMarkers = "Lactose fermenter",
+            method = "Disk Diffusion",
+            matchId = "#427",
+            probabilityList = listOf(
+                ProbabilityItem("K. pneumoniae", 0.96f),
+                ProbabilityItem("K. oxytoca", 0.15f),
+                ProbabilityItem("Enterobacter", 0.08f)
+            )
         )
     )
 }
