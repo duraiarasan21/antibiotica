@@ -183,29 +183,21 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Button(
+                PrimaryButton(
+                    text = "Capture",
                     onClick = { cameraLauncher.launch(null) },
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
-                ) {
-                    Icon(Icons.Default.PhotoCamera, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Capture", fontWeight = FontWeight.Bold)
-                }
-                Button(
+                    icon = Icons.Default.PhotoCamera,
+                    modifier = Modifier.weight(1f)
+                )
+                PrimaryButton(
+                    text = "Gallery",
                     onClick = {
                         val intent = Intent(context, GalleryActivity::class.java)
                         galleryLauncher.launch(intent)
                     },
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
-                ) {
-                    Icon(Icons.Default.PhotoLibrary, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Gallery", fontWeight = FontWeight.Bold)
-                }
+                    icon = Icons.Default.PhotoLibrary,
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -241,7 +233,6 @@ fun UploadSampleScreen(onBackClick: () -> Unit, onAnalyzeClick: (PathogenData) -
                             Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Primary, modifier = Modifier.size(64.dp))
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(text = "Sample Selected", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                            Text(text = selectedPathogen?.name ?: "", style = MaterialTheme.typography.bodyMedium, color = Color.White)
                             Text(text = "Tap to change", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
                         }
                     }

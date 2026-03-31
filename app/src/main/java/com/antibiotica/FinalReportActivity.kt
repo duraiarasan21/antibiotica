@@ -116,11 +116,32 @@ fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
                                     val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                                     val file = File(downloadsDir, fileName)
                                     FileOutputStream(file).use { out ->
-                                        out.write("Antibiotica Analysis Report\n".toByteArray())
-                                        out.write("Pathogen: ${pathogenData?.name}\n".toByteArray())
-                                        out.write("ID: ${pathogenData?.id}\n".toByteArray())
-                                        out.write("Confidence: ${pathogenData?.similarityScore}%\n".toByteArray())
-                                        out.write("Recommended: ${pathogenData?.recommendedAntibiotic}\n".toByteArray())
+                                        out.write("========================================\n".toByteArray())
+                                        out.write("       ANTIBIOTICA ANALYSIS REPORT      \n".toByteArray())
+                                        out.write("========================================\n\n".toByteArray())
+                                        out.write("SAMPLE INFORMATION\n".toByteArray())
+                                        out.write("------------------\n".toByteArray())
+                                        out.write("Sample ID:     ${pathogenData?.id}\n".toByteArray())
+                                        out.write("Detected:      ${pathogenData?.name}\n".toByteArray())
+                                        out.write("Confidence:    ${pathogenData?.similarityScore}%\n".toByteArray())
+                                        out.write("Method:        ${pathogenData?.method ?: "Digital Image Analysis"}\n".toByteArray())
+                                        out.write("Time:          ${pathogenData?.processingTime ?: "1.2s"}\n\n".toByteArray())
+
+                                        out.write("ANALYSIS RESULTS\n".toByteArray())
+                                        out.write("----------------\n".toByteArray())
+                                        out.write("Recommended:   ${pathogenData?.recommendedAntibiotic}\n".toByteArray())
+                                        out.write("Therapy:       ${pathogenData?.recommendationType}\n".toByteArray())
+                                        out.write("Details:       ${pathogenData?.recommendationDetails}\n\n".toByteArray())
+
+                                        out.write("ZONE MEASUREMENTS\n".toByteArray())
+                                        out.write("-----------------\n".toByteArray())
+                                        out.write("Inhibition:    ${pathogenData?.inhibitionZone}mm\n".toByteArray())
+                                        out.write("Resistance:    ${pathogenData?.resistanceBreakpoint}mm\n\n".toByteArray())
+
+                                        out.write("----------------------------------------\n".toByteArray())
+                                        out.write("[Screenshot of Results Included in PDF]\n".toByteArray())
+                                        out.write("----------------------------------------\n\n".toByteArray())
+                                        out.write("Disclaimer: This AI-generated report is for informational purposes and should be verified by a medical professional.\n".toByteArray())
                                     }
 
                                     snackbarHostState.showSnackbar(

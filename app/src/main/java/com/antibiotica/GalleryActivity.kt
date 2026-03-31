@@ -74,7 +74,7 @@ fun GalleryScreen(onBackClick: () -> Unit, onSampleSelect: (com.antibiotica.data
                 GallerySampleCard(
                     pathogen = pathogen,
                     isSelected = false,
-                    showName = true,
+                    showName = false,
                     onClick = { onSampleSelect(pathogen) }
                 )
             }
