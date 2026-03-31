@@ -42,6 +42,10 @@ import android.os.Environment
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
+import android.graphics.BitmapFactory
+import android.content.ContentValues
+import android.provider.MediaStore
+import android.net.Uri
 
 class FinalReportActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +75,8 @@ fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
     var selectedFormat by remember { mutableStateOf("PDF") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val resources = androidx.compose.ui.platform.LocalContext.current.resources
+    val contentResolver = androidx.compose.ui.platform.LocalContext.current.contentResolver
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -116,8 +122,17 @@ fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
 
                             scope.launch {
                                 try {
-                                    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                                    val file = File(downloadsDir, fileName)
+                                    val resolver = contentResolver
+                                    val contentValues = ContentValues().apply {
+                                        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                                        put(MediaStore.MediaColumns.MIME_TYPE, if (selectedFormat == "PDF") "application/pdf" else "text/csv")
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                                        }
+                                    }
+
+                                    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                                    if (uri == null) throw Exception("Failed to create MediaStore entry")
 
                                     if (selectedFormat == "PDF") {
                                         val pdfDocument = PdfDocument()
@@ -166,25 +181,30 @@ fun FinalReportScreen(pathogenData: PathogenData?, onBackClick: () -> Unit) {
                                         canvas.drawText("Resistance Breakpoint: ${pathogenData?.resistanceBreakpoint}mm", 50f, y, paint)
 
                                         y += 60f
-                                        paint.color = Color.Gray.toArgb()
-                                        canvas.drawText("[Logo Placeholder]", 240f, y, paint)
+                                        pathogenData?.let { data ->
+                                            val logoBitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
+                                            val scaledLogo = android.graphics.Bitmap.createScaledBitmap(logoBitmap, 60, 60, true)
+                                            canvas.drawBitmap(scaledLogo, 267f, y, paint)
+                                            y += 80f
 
-                                        y += 100f
-                                        canvas.drawRect(50f, y, 545f, y + 200f, Paint().apply { color = Color.LightGray.toArgb(); style = Paint.Style.STROKE })
-                                        canvas.drawText("Screenshot of Results Placeholder", 180f, y + 110f, paint)
+                                            val sampleBitmap = BitmapFactory.decodeResource(resources, data.imageResId)
+                                            val scaledSample = android.graphics.Bitmap.createScaledBitmap(sampleBitmap, 400, 300, true)
+                                            canvas.drawBitmap(scaledSample, 97f, y, paint)
+                                            y += 320f
+                                        }
 
-                                        y += 250f
+                                        y += 20f
                                         paint.textSize = 10f
                                         canvas.drawText("Disclaimer: This AI-generated report is for informational purposes.", 50f, y, paint)
 
                                         pdfDocument.finishPage(page)
-                                        FileOutputStream(file).use { out ->
+                                        resolver.openOutputStream(uri)?.use { out ->
                                             pdfDocument.writeTo(out)
                                         }
                                         pdfDocument.close()
                                     } else {
                                         // Simple CSV implementation
-                                        FileOutputStream(file).use { out ->
+                                        resolver.openOutputStream(uri)?.use { out ->
                                             out.write("Attribute,Value\n".toByteArray())
                                             out.write("Sample ID,${pathogenData?.id}\n".toByteArray())
                                             out.write("Detected,${pathogenData?.name}\n".toByteArray())
