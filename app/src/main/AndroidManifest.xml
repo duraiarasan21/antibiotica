@@ -26,6 +26,7 @@
         <activity android:name=".AnalyzingSampleActivity"></activity>
         <activity android:name=".AnalysisResultsActivity"></activity>
         <activity android:name=".FinalReportActivity"></activity>
+        <activity android:name=".GalleryActivity"></activity>
     </application>
 
 </manifest>
